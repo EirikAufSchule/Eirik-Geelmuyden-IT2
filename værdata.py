@@ -19,5 +19,3 @@ for i in range(3):
     liste = målinger[i]
     avg = sum(liste)/len(liste)
     print(f"Gjennomsnitts{målinger[i+3]} for uken var {avg:.2f}")
-
-1
