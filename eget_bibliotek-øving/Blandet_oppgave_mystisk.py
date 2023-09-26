@@ -1,6 +1,7 @@
-def hokuspokus(tekst, n):
+def hokuspokus(tekst:str, n:int) -> str:
+  
   nytekst = ""
-
+  """går tegn for tegn, gjør om til ascii verdien, øker med funksjonsparameter nr.2, og gjør så tilbake om til vanlig tegn"""
   for bokstav in tekst:
     tallkode = ord(bokstav)
     tallkode += n
@@ -8,7 +9,7 @@ def hokuspokus(tekst, n):
 
   return nytekst
 
-def simsalabim(tekst, n):
+def simsalabim(tekst:str, n:int) -> str:
   nytekst = ""
 
   for bokstav in tekst:
