@@ -22,7 +22,7 @@ def getPageNumber() -> int:
         print("ValueError")
     return number
 
-#sidetall for start på hvert kapittel
+#sidetall for start på hvert kapittel. Ulikt for hver Unibok. 
 chapter_starts = {
     "kapittel_1": 7,
     "kapittel_2": 42, 
@@ -56,6 +56,7 @@ for i in range(len(chapter_starts)):
     page = str(chapter_starts[pageNumbersKeys[i]])
     #setter sammen med URL-roten
     url = urlStart + page
+    #åpner siden
     wb.open(url)
     time.sleep(3)
     #flytter mus til side og klikker vekk navbar
@@ -75,10 +76,5 @@ for i in range(len(chapter_starts)):
         pyautogui.press('pagedown')
         time.sleep(1.3)
         ssCount += 1
-
+    #lukker siden
     pyautogui.hotkey('command', 'w')
-
-
-
-
-
