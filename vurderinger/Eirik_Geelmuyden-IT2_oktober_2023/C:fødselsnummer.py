@@ -30,7 +30,7 @@ def maanedStrMatch(maaned):
         case "1":
             return "januar"
         case "2":
-            return"februar"
+            return "februar"
         case "3":
             return "mars"
         case"4":

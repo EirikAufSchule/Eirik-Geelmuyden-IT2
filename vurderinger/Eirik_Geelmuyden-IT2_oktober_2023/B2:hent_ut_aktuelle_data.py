@@ -12,7 +12,7 @@ def skrivProduktInfo(id):
 
     print(f"ID:{id}")
     produkt_keys = list(produkt.keys())
-
+    
     for key in produkt_keys:
         value = produkt[key]
         if isinstance(value, dict):
