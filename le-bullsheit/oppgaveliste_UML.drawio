@@ -1,0 +1,34 @@
+<mxfile host="app.diagrams.net" modified="2023-11-30T13:41:45.048Z" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36" etag="-qe3G8FccKQJfesrVka2" version="22.1.5" type="device">
+  <diagram id="tWxnnAWjmP3PjMEybVv9" name="Page-1">
+    <mxGraphModel dx="1766" dy="892" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="u2WPllXDK8i95ugVE_U0-3" value="Oppgaveliste" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="240" y="170" width="210" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="u2WPllXDK8i95ugVE_U0-9" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="u2WPllXDK8i95ugVE_U0-5" target="u2WPllXDK8i95ugVE_U0-8">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="u2WPllXDK8i95ugVE_U0-5" value="__str__()&lt;br&gt;endre_prioritet()&lt;br&gt;endre_tittel()&lt;br&gt;legg_til_oppgave()&lt;br&gt;sorter_etter_deadline()&lt;br&gt;sorter_etter_oppretting()&lt;br&gt;slett_oppgave()" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="240" y="220" width="210" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="u2WPllXDK8i95ugVE_U0-8" value="Oppgave" style="whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="100" y="460" width="200" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="u2WPllXDK8i95ugVE_U0-10" value="__str__()" style="whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="100" y="590" width="200" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="u2WPllXDK8i95ugVE_U0-11" value="tittel&lt;br&gt;info&lt;br&gt;dato_laget&lt;br&gt;siden_epoch_opprettet&lt;br&gt;info&lt;br&gt;deadline" style="whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="100" y="490" width="200" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="u2WPllXDK8i95ugVE_U0-12" value="Inne i listen" style="whiteSpace=wrap;html=1;direction=west;" vertex="1" parent="1">
+          <mxGeometry x="220" y="380" width="100" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="u2WPllXDK8i95ugVE_U0-13" value="liste" style="whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="240" y="200" width="210" height="20" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
