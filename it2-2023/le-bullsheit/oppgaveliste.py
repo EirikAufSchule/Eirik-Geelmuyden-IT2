@@ -59,6 +59,7 @@ class OppgaveListe():
         self.liste[index].tittel = ny_tittel
         print(
             f"Tittel endret fra {forrige_tittel} til {ny_tittel}", end="\n\n")
+    #legge til oppgave
 
     def legg_til_oppgave(self):
         addNewTask = True
