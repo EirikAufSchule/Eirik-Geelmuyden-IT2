@@ -186,6 +186,8 @@ for i in range(9):
     explosion_imgs.append(py.image.load(f"pygame/spaceinvaders/explosion_sheet/tile00{i}.png"))
 
 hit_objs = []
+kills = 0
+cash = 0
 
 ship = Player(surf, surf_width/2, 550, 100, 140, "pygame/spaceinvaders/naboo-starfighter.png")
 
@@ -222,8 +224,9 @@ while True:
         for objs in [Asteroid.asteroids,foes]:
             hit, obj = shot.check_target(objs)
             if hit:
-                frame = 0
-                hit_objs.append([obj, frame])
+                #explosion frame
+                frame_nr = 0
+                hit_objs.append([obj, frame_nr])
                 objs.remove(obj)
                
 
