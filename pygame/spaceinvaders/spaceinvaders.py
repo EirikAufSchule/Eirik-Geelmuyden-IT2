@@ -1,150 +1,27 @@
+from turtle import width
 import pygame as py
 from pygame.locals import *
 import random as ran
+import math
+from classes import *
+import json
 
-
-class KineticBody:
-
-    def __init__(self,surf, x, y, width, height, health = None, img = None, dmgd_img = None):
-        self.surf = surf
-        self.x = x
-        self.y = y
-        if img != None:
-            self.img =  py.transform.scale(py.image.load(img),(width,height))
-        if dmgd_img != None:
-            self.dmgd_img = py.transform.scale(py.image.load(dmgd_img),(width,height))
-        else:
-            self.dmgd_img = None
-        self.height = height
-        self.width = width
-        self.health = health
-        
-    def draw(self):
-        self.surf.blit(self.img, (self.x, self.y))
-
-    def check_border(self, surf):
-        self.x = max(0, min(self.x,surf.get_width()-self.width))
-            
-        self.y = max(0, min(self.y,surf.get_height()))
-    
-    def explode(self, frame_img):
-        self.surf.blit(frame_img, (self.x, self.y))
-
-
-
-class Player(KineticBody):
-    def __init__(self, surf, x, y, width, height, img:str):
-        super().__init__(surf, x, y, width, height, img = img) 
-
-    def shoot(self):
-        x_midpoint = self.x + self.width/2 + 4
-        Shot.shots.append(Shot(self.surf, x_midpoint + 20, self.y, 0, -10, 1, 15, 50))
-        Shot.shots.append(Shot(self.surf, x_midpoint - 30, self.y, 0, -10, 1, 15,  50))
-
-    def key_input(self):
-
-        x, y = py.mouse.get_pos()
-        self.x = x
-        if y < 450:
-            self.y = 450
-        else:
-            self.y = y
-"""     key = py.key.get_pressed()
-        if key[K_LEFT]:
-            self.x -= 10
-            self.check_border(surf)
-
-        elif key[K_RIGHT]:
-            self.x += 10
-            self.check_border(surf)"""
-
-
-
-class Foe(KineticBody):
-    def __init__(self, surf, x, y, v, width, height,health,):
-        img = "pygame/spaceinvaders/vulture-droid.png"
-        dmgd_img = "pygame/spaceinvaders/vulture_droid_damaged.png"
-        super().__init__(surf, x, y, width, height, health, img = img, dmgd_img = dmgd_img)
-        self.v = v
-
-    def move(self):
-        self.y += self.v
-
-
-
-class Shot(KineticBody):
-    shots = []  
-    def __init__(self, surf, x, y, v_x, v_y, width, height, dmg):
-        super().__init__(surf, x, y, width, height)
-        self.v_x = v_x
-        self.v_y = v_y
-        self.dmg = dmg
-        
-
-    def draw(self):
-        py.draw.ellipse(self.surf, "red", py.Rect(self.x, self.y, self.width, self.height))
-
-    def move(self):
-        self.x += self.v_x
-        self.y += self.v_y
-
-        if shot.y <= 0:
-            Shot.shots.remove(shot)
-
-    def check_target(self, targets):##
-        dead_target = None
-        hit = False
-        for target in targets:##
-            if target.y + target.height >= self.y:
-                if target.x <= self.x <= target.x + target.width or target.x <= self.x + self.width<= target.x + target.width:
-                    target.health -= shot.dmg
-                    self.shots.remove(shot)
-                    if target.health <= 0: 
-                        hit = True
-                        dead_target = target
-                    elif target.dmgd_img != None: 
-                        target.img = target.dmgd_img
-
-        return hit, dead_target
-
-
-class Asteroid(KineticBody):
-    asteroids = []
-    imgs = []
-    zeros = "00"
-    for i in range(48):
-        if i > 9:
-            zeros = "0"
-        imgs.append(py.image.load(f"pygame/spaceinvaders/asteroid_sheet/tile{zeros}{i}.png")) 
-    def __init__(self, surf, x, y, width, height, health, value):
-        super().__init__(surf, x, y, width, height, health)
-        self.value = value
-        self.frame = 0 
-        self.v = 4
-
-    def move(self):
-        self.y += self.v
-    
-    def draw(self):
-        if self.frame <= len(self.imgs) -2:
-            self.frame += 1
-        else:
-            self.frame = 0
-        self.surf.blit(self.imgs[self.frame],(self.x,self.y))
-        
-
-def spawn_asteroids(amount,surf):
+#spawns asteroids in relation to amount, here the level
+def spawn_asteroids(lvl,surf):
+    amount = 1 + math.floor(lvl/3)
     for i in range(amount):
-        Asteroid.asteroids.append(Asteroid(surf,ran.randint(100, surf.get_width()-100), ran.randint(0, 100),40,40,200,amount*10))
+        Asteroid.asteroids.append(Asteroid(surf,ran.randint(100, surf.get_width()-100), ran.randint(0, 100),80,80 ,200,amount*10))
 
+#spawns asteroids in relation to level
 def spawn_foes(foes, lvl, surf):
     for i in range(lvl):
         foes.append(Foe(surf, ran.randint(100, surf.get_width()-100), ran.randint(0, 100),i, 30, 60,100))
     return foes    
 
-
+#draws each layer of the stars, each of its own index in "stars"
 def draw_stars(stars):
     for i in range(len(stars)):
+        #each layer has its own size on and speed for the stars, giving a parallax effect
         side = i + 1
         speed = i + 2
         for star in stars[i]:
@@ -153,7 +30,7 @@ def draw_stars(stars):
                 star[1] = 0
             py.draw.rect(surf,(255,255,255), py.Rect(star[0],star[1], side, side))
 
-        
+#makes "layers" amount of stars, with "star_count" -amount of stars per layer
 def get_stars(layers, star_count):
     stars = []
     for i in range(layers):
@@ -167,6 +44,17 @@ def get_stars(layers, star_count):
         stars.append(current_stars)
     return stars
 
+#draw text on the screen
+def draw_text(fontsize, name, counter, pos, color1, color2):
+    font = py.font.Font('freesansbold.ttf', fontsize)
+
+    text = font.render(f'{name}: {counter}', True, color1, color2)
+    
+    text_rect = text.get_rect()
+
+    text_rect.center = pos
+
+    surf.blit(text, text_rect)
 
 
 py.init()
@@ -178,7 +66,6 @@ lvl = 0
 
 stars = get_stars(3,50)
 
-
 foes = []
 explosion_imgs = []
 
@@ -186,65 +73,129 @@ for i in range(9):
     explosion_imgs.append(py.image.load(f"pygame/spaceinvaders/explosion_sheet/tile00{i}.png"))
 
 hit_objs = []
+
 kills = 0
 cash = 0
 
-ship = Player(surf, surf_width/2, 550, 100, 140, "pygame/spaceinvaders/naboo-starfighter.png")
+ship = Player(surf, surf_width/2, 550, 100, 140, "pygame/spaceinvaders/naboo-starfighter.png", 1)
+ 
+game_over = False
 
+gamemode = "gameloop"
 
 while True:
-    surf.fill("black")
+    
     for e in py.event.get():
         if e.type == QUIT:
             py.quit()
             exit()
         elif e.type == py.KEYDOWN:
-            if e.key == K_SPACE:
+            if e.key == K_SPACE and gamemode == "gameloop":
                 ship.shoot()
-    
-    draw_stars(stars)
 
-    if len(foes) == 0: 
-        spawn_asteroids(lvl, surf)
-        foes = spawn_foes(foes,lvl, surf)
-        lvl += 1
-        Shot.shots.clear()
+    match gamemode:
+        case "gameloop":
+            surf.fill("black")
 
-    for asteroid in Asteroid.asteroids:
-        asteroid.draw()
-        asteroid.move()
+            draw_stars(stars)
 
-    for foe in foes:
-        foe.move()
-        foe.draw()
-        if foe.y >= surf.get_height():
-            py.quit()
+            if len(foes + hit_objs + Asteroid.asteroids) == 0: 
+                lvl += 1
+                gamemode = "level change"
+                lvl_change_frames = 0
+                spawn_asteroids(lvl, surf)
+                foes = spawn_foes(foes,lvl, surf)
+                Shot.shots.clear()
 
-    for shot in Shot.shots:
-        for objs in [Asteroid.asteroids,foes]:
-            hit, obj = shot.check_target(objs)
-            if hit:
-                #explosion frame
-                frame_nr = 0
-                hit_objs.append([obj, frame_nr])
-                objs.remove(obj)
-               
+            for asteroid in Asteroid.asteroids:
+                asteroid.draw()
+                asteroid.move()
+                if asteroid.y >= surf.get_height():
+                    Asteroid.asteroids.remove(asteroid)
 
-        shot.draw()
-        shot.move()
 
-    if len(hit_objs) > 0:
-        for obj in hit_objs:
-            obj[0].move()
-            frame_nr = obj[1]
-            if frame_nr < 9:
-                obj[0].explode(explosion_imgs[frame_nr])
-                obj[1] += 1
-            else:
-                hit_objs.remove(obj)
+            ship.key_input()
+            ship.draw()
+            
+            for foe in foes:
+                foe.move()
+                foe.draw()
+                if foe.y >= surf.get_height():
+                    ship.lives -= 1
+                    foes.remove(foe)
+                if ship.lives <= 0:
+                    gamemode = "game over"
 
-    ship.key_input()
-    ship.draw()        
+            for objs in [Asteroid.asteroids,foes]:
+                #hit, obj =
+                hit, obj = ship.check_collisions(objs)
+                if hit:
+                    hit_objs.append([obj, 0])
+                    ship.lives -= 1
+                    objs.remove(obj)
+
+                for shot in Shot.shots:
+                    hit, obj = shot.check_target(objs)
+                    if hit:
+                        #explosion frame
+                        frame_nr = 0
+                        hit_objs.append([obj, 0])
+                        objs.remove(obj)
+                        if isinstance(obj, Asteroid):
+                            cash += obj.value
+                        else:
+                            kills += 1  
+            
+            for shot in Shot.shots:
+                shot.draw()
+                shot.move()
+
+            
+
+            if len(hit_objs) > 0:
+                for obj in hit_objs:
+                    obj[0].move()
+                    frame_nr = obj[1]
+                    if frame_nr < 9:
+                        obj[0].explode(explosion_imgs[frame_nr])
+                        obj[1] += 1
+                    else:
+                        hit_objs.remove(obj)
+
+            draw_text(16, "KILLS", kills, (surf.get_width()-100, 20))
+            draw_text(16, "CASH", cash, (surf.get_width()-100, 40))
+            draw_text(16, "LIVES", ship.lives, (surf.get_width()-100, 60))
+            draw_text(16, "LEVEL", lvl, (surf.get_width()-100, 80))
+
+        case "level change":
+            lvl_str = str(lvl)
+            number_imgs = []
+            width_sum = 0
+            if lvl_change_frames == 0:
+                for i in range(len(lvl_str)):
+                    img = py.image.load(f"pygame/spaceinvaders/level_imgs/BulkResizePhotos.com/{lvl_str[i]}.png")
+                    number_imgs.append(img)
+                    width_sum += img.get_width()
+
+            """  s = py.Surface((1000,750))  # the size of your rect
+                s.set_alpha(2) 
+                s.fill((000,255,255))  
+ """
+            x = (surf.get_width() - width_sum)/2
+            for img in number_imgs:
+                surf.blit(img, (x, 200))
+                x += img.get_width()
+
+            #surf.blit(s, (0,0))         
+
+            lvl_change_frames += 1
+            if lvl_change_frames > 24:
+                gamemode = "gameloop"
+
+        case "game over":
+            game_over_img = py.transform.scale(py.image.load("pygame/spaceinvaders/game_over.png"),(1000,800))
+            surf.blit(game_over_img, ((surf.get_width()- 1000)/2, (surf.get_height() - 800)/2))
+           
 
 
     py.time.Clock().tick(24)
