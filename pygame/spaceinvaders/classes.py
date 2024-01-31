@@ -1,5 +1,7 @@
 import pygame as py
 from pygame.locals import *
+import math
+
 
 class KineticBody:
 
@@ -34,10 +36,11 @@ class Player(KineticBody):
     def __init__(self, surf, x, y, width, height, img:str, lives):
         super().__init__(surf, x, y, width, height, img = img) 
         self.lives = lives
+        self.hit_index = None
     def shoot(self):
         x_midpoint = self.x + self.width/2 + 4
-        Shot.shots.append(Shot(self.surf, x_midpoint + 20, self.y, 0, -10, 1, 15, 50))
-        Shot.shots.append(Shot(self.surf, x_midpoint - 30, self.y, 0, -10, 1, 15,  50))
+        Shot.shots.append(Shot(self.surf, x_midpoint + 20, self.y, 0, -15, 1, 15, 50))
+        Shot.shots.append(Shot(self.surf, x_midpoint - 30, self.y, 0, -15, 1, 15,  50))
 
     def key_input(self):
 
@@ -71,22 +74,26 @@ class Shot(KineticBody):
         self.x += self.v_x
         self.y += self.v_y
         if self.y <= 0:
-            Shot.shots.remove(self)
-
+            try:
+                Shot.shots.remove(self)
+            except ValueError:
+                pass
     def check_target(self, targets):##
         dead_target = None
         hit = False
-        for target in targets:##
+        for target in targets[:]:##
             if target.y + target.height >= self.y:
                 if target.x <= self.x <= target.x + target.width or target.x <= self.x + self.width<= target.x + target.width:
                     target.health -= self.dmg
-                    Shot.shots.remove(self)
+                    try:
+                        Shot.shots.remove(self)
+                    except ValueError:
+                        pass
                     if target.health <= 0: 
                         hit = True
                         dead_target = target
                     elif target.dmgd_img != None: 
                         target.img = target.dmgd_img
-
         return hit, dead_target
 
 
@@ -101,9 +108,6 @@ class Foe(KineticBody):
         self.y += self.v
 
 
-
-
-
 class Asteroid(KineticBody):
     asteroids = []
     imgs = []
@@ -112,6 +116,7 @@ class Asteroid(KineticBody):
         if i > 9:
             zeros = "0"
         imgs.append(py.image.load(f"pygame/spaceinvaders/asteroid_sheet/tile{zeros}{i}.png")) 
+
     def __init__(self, surf, x, y, width, height, health, value):
         super().__init__(surf, x, y, width, height, health)
         self.value = value
@@ -128,3 +133,89 @@ class Asteroid(KineticBody):
             self.frame = 0
         self.surf.blit(py.transform.scale(self.imgs[self.frame], (self.width, self.height)),(self.x,self.y))
         
+
+
+class Button():
+
+    def __init__(self, surf, x, y, radius):
+        self.surf = surf
+        self.x = x
+        self.y= y
+        self.radius = radius
+        self.flick_count = 0
+
+    def pressed(self, mouse_pos):
+        rel_x = abs(self.x - mouse_pos[0])
+        rel_y = abs(self.y - mouse_pos[1])
+        hyp = math.sqrt(rel_x**2 + rel_x**2)
+        if hyp <= self.radius:
+            return True
+        else:
+            return False
+
+    def draw(self):
+        
+        py.draw.circle(self.surf, "green", (self.x, self.y), self.radius)
+        img_side = self.radius*1.5
+        image = py.transform.scale(py.image.load("pygame/spaceinvaders/fiaball.png"), (img_side, img_side))
+
+        self.surf.blit(image, (self.x - img_side/1.7, self.y-img_side/1.7))
+
+class Super(Shot):
+    price = 100
+    explosion_imgs = []
+    zeros = "00"
+    for i in range(23):
+        if i > 9:
+            zeros = "0"
+        explosion_imgs.append(py.image.load(f"pygame/spaceinvaders/super_frames/tile{zeros}{i}.png")) 
+
+    def __init__(self, surf, x, y):
+        super().__init__(surf,x, y, 0, -10, 5, 10, 200)
+        self.exploded = False
+        self.explosion_frame = 0
+        self.exist = False
+        self.radius = 100
+        self.side = 2*self.radius
+
+    def draw(self):
+        if self.exploded:
+            if self.explosion_frame < 23:
+                image = py.transform.scale(Super.explosion_imgs[self.explosion_frame], (self.radius*2 + 20, self.radius*2 + 20))
+                self.surf.blit(image,(self.x - self.radius, self.y - self.radius))
+                self.explosion_frame += 1
+            else:
+                self.exist = False
+        else:
+            py.draw.rect(self.surf, "green", (self.x, self.y, self.width, self.height))
+    
+    def check_target(self, targets):
+        if super().check_target(targets)[0]:
+            self.exploded = True
+    def detect_explosion_collision(self, enemies, radius):
+        potential_cash = 0
+        affected_enemies = []
+
+        for enemy in enemies:
+        
+            # Find closest point on rectangle to the center of the circle
+            closest_x = max(enemy.x, min(self.x, enemy.x + enemy.width))
+            closest_y = max(enemy.y, min(self.y, enemy.y + enemy.height))
+
+            # Calculate distance between closest point and circle center
+            distance = math.sqrt((self.x - closest_x) ** 2 + (self.y - closest_y) ** 2)
+
+            # Check if distance is within the explosion radius
+            if distance <= radius:
+                affected_enemies.append([enemy, 0])
+                try:
+                    potential_cash += enemy.value
+                    print("hoe")
+                except AttributeError:
+                    potential_cash += 0
+
+            for i in affected_enemies:
+                if i[0] in enemies:
+                    enemies.remove(i[0])
+            
+        return enemies, affected_enemies, potential_cash
